@@ -26,6 +26,9 @@ dependencies:
   #For path provider
   path_provider: ^2.0.15
 
+  #For google fonts
+  google_fonts: ^5.0.0
+
 
 dev_dependencies:
   flutter_test:

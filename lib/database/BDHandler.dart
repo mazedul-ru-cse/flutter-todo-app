@@ -7,16 +7,16 @@ import 'package:path_provider/path_provider.dart';
 
 class DBHandler {
   //database name
-  static const dbName = "todo.db";
+  static const dbName = "todov.db";
 
   static const tableName = "todo";
 
   static const id = "id";
   static const title = "title";
   static const status = "status";
-  static const atCreate = "at_create";
+  static const createAt = "create_at";
 
-  static const dbVersion = 1;
+  static const dbVersion = 2;
 
   static final DBHandler instance = DBHandler();
 
@@ -25,10 +25,10 @@ class DBHandler {
   }
 
   initDB() async {
-    //Android database path
+    //Database path
     Directory directory = await getApplicationDocumentsDirectory();
-
     String path = join(directory.path, dbName);
+    print("Path : $path");
 
     return await openDatabase(path, version: dbVersion, onCreate: onCreate);
   }
@@ -37,17 +37,17 @@ class DBHandler {
     try {
       await db.execute('''
       CREATE TABLE $tableName(
-                $id TEXT PRIMARY KEY AUTOINCREMENT,
+                $id INTEGER PRIMARY KEY AUTOINCREMENT,
                 $title TEXT,
-                $status BOOLEAN,
-                $atCreate DATETIME
+                $status BOOLEAN DEFAULT false,
+                $createAt DATETIME
                 )''');
     } catch (e) {
       log("Database create error : $e");
     }
   }
 
-  //Update do
+  //Update todo
   editTodo(Map<String, dynamic> row, String phoneNumber) async {
     try {
       Database? db = await instance.database;
@@ -56,7 +56,7 @@ class DBHandler {
     } catch (e) {}
   }
 
-  //Update do
+  //Delete todo
   void deleteTodo(int index) async {
     try {
       Database? db = await instance.database;
@@ -70,5 +70,15 @@ class DBHandler {
       Database? db = await instance.database;
       await db!.insert(tableName, row);
     } catch (e) {}
+  }
+
+  //Todos
+  Future<List<Map<String, dynamic>>> todos() async {
+    try {
+      Database? db = await instance.database;
+      return await db!.query(tableName, orderBy: "$id DESC");
+    } catch (e) {
+      return [];
+    }
   }
 }
