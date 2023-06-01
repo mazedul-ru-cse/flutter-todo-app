@@ -16,8 +16,15 @@ dependencies:
 
 
   cupertino_icons: ^1.0.2
+
   #For state management
   get: ^4.6.5
+
+  #Flutter SQLite database
+  sqflite: ^2.2.6
+
+  #For path provider
+  path_provider: ^2.0.15
 
 
 dev_dependencies:
