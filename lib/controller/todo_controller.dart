@@ -3,7 +3,7 @@ import 'package:todo/database/BDHandler.dart';
 import 'package:todo/model/todo_model.dart';
 
 class TodoController extends GetxController {
-  List<TodoModel> todoList = [];
+  RxList<TodoModel> todoList = <TodoModel>[].obs;
 
   bool isLoading = true;
 
@@ -19,12 +19,12 @@ class TodoController extends GetxController {
     todoList.clear();
 
     isLoading = true;
-    update();
+    //update();
 
     // get the all todos from database
     List<Map<String, dynamic>> temp = await DBHandler.instance.todos();
 
-    print(temp);
+    //print(temp);
 
     // added the all todos in todosList
     for (var value in temp) {
@@ -41,22 +41,44 @@ class TodoController extends GetxController {
     //Current date and time
     String date =
         "${numberFormate(dateTime.day)}-${numberFormate(dateTime.month)}-${numberFormate(dateTime.year)}";
-    String time = dateTime.toLocal().toString();
+    String time =
+        "${numberFormate(dateTime.hour)}:${numberFormate(dateTime.minute)}";
 
     DBHandler.instance.addTodo({"title": title, "create_at": "$date $time"});
 
     setdata();
   }
 
-  Future<void> changeStatus(int? todoId, bool todoStatus) async {
+  void changeStatus(int? todoId, bool todoStatus) async {
     await DBHandler.instance.changeStatus(todoId!, todoStatus);
 
     setdata();
   }
 
-  void editTodo(int id) {}
+  void editTodo(int todoId, String title) async {
+    await DBHandler.instance.editTodo(todoId, title);
 
-  void deleteTodo(int id) {}
+    setdata();
+  }
+
+  void searchTodos(String keyword) async {
+    todoList.clear();
+
+    List<Map<String, dynamic>> temp =
+        await DBHandler.instance.searchTodos(keyword);
+
+    // added the all todos in todosList
+    for (var value in temp) {
+      todoList.add(TodoModel.formMap(value));
+    }
+
+    update();
+  }
+
+  void deleteTodo(int? todoId) {
+    DBHandler.instance.deleteTodo(todoId!);
+    setdata();
+  }
 
   String numberFormate(int num) {
     if (num <= 9) {

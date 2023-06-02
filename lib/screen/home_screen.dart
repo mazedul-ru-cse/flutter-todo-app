@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:todo/constants/colors.dart';
 import 'package:todo/controller/todo_controller.dart';
+import 'package:todo/model/todo_model.dart';
+import 'package:todo/screen/todo_details.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,23 +14,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final todoTitleController = TextEditingController();
-
   //Todo controller for state management
   TodoController todoController = Get.put(TodoController());
+
+  //Text Field controller
+  final searchController = TextEditingController();
+  final todoTitleController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "All Tasks",
-          style: GoogleFonts.acme(fontSize: 22),
-        ),
-        backgroundColor: Colors.blue,
-        systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.blue),
-        centerTitle: true,
-      ),
+      backgroundColor: mBGColor,
       body: getBody(),
       floatingActionButton: addTodoButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -38,14 +34,53 @@ class _HomeScreenState extends State<HomeScreen> {
   // Widget body
   Widget getBody() {
     return SafeArea(
-      child: Container(
-        margin: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            Expanded(child: displayTodos()),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          searchBox(),
+          getTitle(),
+          SizedBox(
+            height: 10,
+          ),
+          Expanded(child: displayTodos()),
+        ],
       ),
+    );
+  }
+
+  //Search box
+
+  Widget searchBox() {
+    return Container(
+      margin: const EdgeInsets.only(left: 10, right: 10, top: 10),
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(20)),
+      child: TextField(
+        controller: searchController,
+        decoration: InputDecoration(
+            contentPadding: EdgeInsets.zero,
+            prefixIcon: Icon(
+              Icons.search,
+              color: mBlack,
+              size: 20,
+            ),
+            prefixIconConstraints: BoxConstraints(maxHeight: 20, maxWidth: 25),
+            border: InputBorder.none,
+            hintText: "Search",
+            hintStyle: TextStyle(color: mGrey)),
+        onChanged: (keyword) => todoController.searchTodos(keyword),
+      ),
+    );
+  }
+
+  //Title
+
+  Widget getTitle() {
+    return Container(
+      margin: EdgeInsets.fromLTRB(10, 15, 10, 20),
+      child: Text("All ToDos",
+          textAlign: TextAlign.left, style: GoogleFonts.acme(fontSize: 23)),
     );
   }
 
@@ -81,6 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () {
                         Navigator.of(context).pop();
                         todoController.addTodo(todoTitleController.text);
+                        todoTitleController.clear();
                       }),
                 ],
               )
@@ -99,18 +135,37 @@ class _HomeScreenState extends State<HomeScreen> {
         return ListView.builder(
           itemCount: todos.todoList.length,
           itemBuilder: (context, index) {
-            return Card(
-              child: ListTile(
-                leading:
-                    Text("${index + 1}", style: GoogleFonts.abel(fontSize: 16)),
+            TodoModel todoModel = todos.todoList[index];
 
-                //todo title
-                title: Text(todos.todoList[index].title.toString(),
-                    style: GoogleFonts.alike(
-                        textStyle: Theme.of(context).textTheme.titleMedium)),
+            return Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              child: ListTile(
+                //Todo details page
+                onTap: () {
+                  Get.to(TodoDetails(
+                    todoModel: todoModel,
+                    index: index,
+                  ));
+                },
 
                 //todo status
-                trailing: changeStatus(todos, index),
+                leading: changeStatus(todoModel, index),
+
+                //todo title
+                title: todoModel.status == 1
+                    ? Text(
+                        todoModel.title.toString(),
+                        style:
+                            TextStyle(decoration: TextDecoration.lineThrough),
+                      )
+                    : Text(
+                        todoModel.title.toString(),
+                        style: GoogleFonts.alike(
+                            textStyle: Theme.of(context).textTheme.titleMedium),
+                      ),
+
+                trailing: deleteButton(todoModel.id),
               ),
             );
           },
@@ -119,20 +174,37 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget changeStatus(TodoController todos, int index) {
-    return todos.todoList[index].status == 1
+  Widget changeStatus(TodoModel todoModel, int index) {
+    return todoModel.status == 1
         ? IconButton(
             icon: Icon(
               Icons.check_circle,
               color: Colors.lightBlue,
               size: 25,
             ),
-            onPressed: () =>
-                todos.changeStatus(todos.todoList[index].id, false),
+            onPressed: () => todoController.changeStatus(todoModel.id, false),
           )
         : IconButton(
-            icon: Icon(Icons.radio_button_unchecked_outlined),
-            onPressed: () => todos.changeStatus(todos.todoList[index].id, true),
+            icon: Icon(Icons.radio_button_unchecked_rounded),
+            onPressed: () => todoController.changeStatus(todoModel.id, true),
           );
+  }
+
+  Widget deleteButton(int? todoId) {
+    return Container(
+        padding: EdgeInsets.all(0),
+        margin: EdgeInsets.symmetric(vertical: 12),
+        height: 35,
+        width: 35,
+        decoration: BoxDecoration(
+          color: mRed,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: IconButton(
+          color: Colors.white,
+          icon: Icon(Icons.delete),
+          iconSize: 17,
+          onPressed: () => todoController.deleteTodo(todoId),
+        ));
   }
 }

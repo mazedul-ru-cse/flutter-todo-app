@@ -28,7 +28,6 @@ class DBHandler {
     //Database path
     Directory directory = await getApplicationDocumentsDirectory();
     String path = join(directory.path, dbName);
-    print("Path : $path");
 
     return await openDatabase(path, version: dbVersion, onCreate: onCreate);
   }
@@ -48,11 +47,11 @@ class DBHandler {
   }
 
   //Update todo
-  editTodo(Map<String, dynamic> row, String phoneNumber) async {
+  editTodo(int todoId, String todoTitle) async {
     try {
       Database? db = await instance.database;
-      await db!
-          .update(tableName, row, where: "$id = ?", whereArgs: [phoneNumber]);
+      await db!.rawQuery(
+          "UPDATE $tableName SET $title = '$todoTitle' WHERE $id = $todoId");
     } catch (e) {}
   }
 
@@ -69,10 +68,10 @@ class DBHandler {
   }
 
   //Delete todo
-  void deleteTodo(int index) async {
+  void deleteTodo(int todoId) async {
     try {
       Database? db = await instance.database;
-      await db!.delete(tableName, where: "$id = $index");
+      await db!.delete(tableName, where: "$id = $todoId");
     } catch (e) {}
   }
 
@@ -90,6 +89,17 @@ class DBHandler {
       Database? db = await instance.database;
       return await db!.query(tableName, orderBy: "$id DESC");
     } catch (e) {
+      return [];
+    }
+  }
+
+  //Todos search
+  Future<List<Map<String, dynamic>>> searchTodos(String keyword) async {
+    try {
+      Database? db = await instance.database;
+      return await db!.query(tableName, where: "$title LIKE '%$keyword%'");
+    } catch (e) {
+      print("Search error : $e");
       return [];
     }
   }
