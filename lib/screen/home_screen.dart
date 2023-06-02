@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:todo/controller/todo_controller.dart';
@@ -19,6 +20,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "All Tasks",
+          style: GoogleFonts.acme(fontSize: 22),
+        ),
+        backgroundColor: Colors.blue,
+        systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.blue),
+        centerTitle: true,
+      ),
       body: getBody(),
       floatingActionButton: addTodoButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -32,10 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
         margin: const EdgeInsets.all(10),
         child: Column(
           children: [
-            Text(
-              "All tasks",
-              style: GoogleFonts.acme(fontSize: 18),
-            ),
             Expanded(child: displayTodos()),
           ],
         ),
@@ -95,13 +101,38 @@ class _HomeScreenState extends State<HomeScreen> {
           itemBuilder: (context, index) {
             return Card(
               child: ListTile(
-                leading: Text("${index + 1}"),
-                title: Text(todos.todoList[index].title.toString()),
+                leading:
+                    Text("${index + 1}", style: GoogleFonts.abel(fontSize: 16)),
+
+                //todo title
+                title: Text(todos.todoList[index].title.toString(),
+                    style: GoogleFonts.alike(
+                        textStyle: Theme.of(context).textTheme.titleMedium)),
+
+                //todo status
+                trailing: changeStatus(todos, index),
               ),
             );
           },
         );
       },
     );
+  }
+
+  Widget changeStatus(TodoController todos, int index) {
+    return todos.todoList[index].status == 1
+        ? IconButton(
+            icon: Icon(
+              Icons.check_circle,
+              color: Colors.lightBlue,
+              size: 25,
+            ),
+            onPressed: () =>
+                todos.changeStatus(todos.todoList[index].id, false),
+          )
+        : IconButton(
+            icon: Icon(Icons.radio_button_unchecked_outlined),
+            onPressed: () => todos.changeStatus(todos.todoList[index].id, true),
+          );
   }
 }

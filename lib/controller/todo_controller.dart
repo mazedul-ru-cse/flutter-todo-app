@@ -24,6 +24,8 @@ class TodoController extends GetxController {
     // get the all todos from database
     List<Map<String, dynamic>> temp = await DBHandler.instance.todos();
 
+    print(temp);
+
     // added the all todos in todosList
     for (var value in temp) {
       todoList.add(TodoModel.formMap(value));
@@ -46,7 +48,11 @@ class TodoController extends GetxController {
     setdata();
   }
 
-  void changeStatus(int id) {}
+  Future<void> changeStatus(int? todoId, bool todoStatus) async {
+    await DBHandler.instance.changeStatus(todoId!, todoStatus);
+
+    setdata();
+  }
 
   void editTodo(int id) {}
 

@@ -56,6 +56,18 @@ class DBHandler {
     } catch (e) {}
   }
 
+  //Change todo status
+  changeStatus(int updateId, bool todoStatus) async {
+    try {
+      print("Id = $updateId , Status = $todoStatus");
+      Database? db = await instance.database;
+      await db!.rawQuery(
+          "UPDATE $tableName SET $status = $todoStatus WHERE $id = $updateId");
+    } catch (e) {
+      print("Errors : $e");
+    }
+  }
+
   //Delete todo
   void deleteTodo(int index) async {
     try {
