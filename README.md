@@ -18,10 +18,11 @@ It's a daily task management Mobile Application. Every user can track their work
   <img src="https://github.com/mazedul-ru-cse/flutter-todo-app/blob/master/screenshots/onboarding%20page%201.jpg" width="250" height="450" name="Login Screen">
 
 ## Onboarding Screen 2
-<img src="https://github.com/mazedul-ru-cse/flutter-todo-app/blob/master/screenshots/onboarding%20page%202.jpg" width="250" height="450" name="SignUp Screen">
+<img src="https://github.com/mazedul-ru-cse/flutter-todo-app/blob/master/screenshots/onboarding%20page%203.jpg.jpg" width="250" height="450" name="Screen one">
 
 ## Onboarding Screen 3
-<img src="https://github.com/mazedul-ru-cse/flutter-todo-app/blob/master/screenshots/onboarding%20page%203.jpg.jpg" width="250" height="450" name="Screen one">
+<img src="https://github.com/mazedul-ru-cse/flutter-todo-app/blob/master/screenshots/onboarding%20page%202.jpg" width="250" height="450" name="SignUp Screen">
+
 
 ## Home Screen
 <img src="https://github.com/mazedul-ru-cse/flutter-todo-app/blob/master/screenshots/Home%20Page%20Screen.jpg" width="250" height="450" name="Setting">
