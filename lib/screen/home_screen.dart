@@ -141,14 +141,6 @@ class _HomeScreenState extends State<HomeScreen> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)),
               child: ListTile(
-                //Todo details page
-                onTap: () {
-                  Get.to(TodoDetails(
-                    todoModel: todoModel,
-                    index: index,
-                  ));
-                },
-
                 //todo status
                 leading: changeStatus(todoModel, index),
 
@@ -165,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             textStyle: Theme.of(context).textTheme.titleMedium),
                       ),
 
-                trailing: deleteButton(todoModel.id),
+                trailing: detailsButton(todoModel, index),
               ),
             );
           },
@@ -190,21 +182,24 @@ class _HomeScreenState extends State<HomeScreen> {
           );
   }
 
-  Widget deleteButton(int? todoId) {
+  Widget detailsButton(TodoModel todoModel, index) {
     return Container(
         padding: EdgeInsets.all(0),
         margin: EdgeInsets.symmetric(vertical: 12),
         height: 35,
         width: 35,
         decoration: BoxDecoration(
-          color: mRed,
+          color: mGrey,
           borderRadius: BorderRadius.circular(5),
         ),
         child: IconButton(
           color: Colors.white,
-          icon: Icon(Icons.delete),
+          icon: Icon(Icons.edit_note),
           iconSize: 17,
-          onPressed: () => todoController.deleteTodo(todoId),
+          onPressed: () => Get.to(TodoDetails(
+            todoModel: todoModel,
+            index: index,
+          )),
         ));
   }
 }

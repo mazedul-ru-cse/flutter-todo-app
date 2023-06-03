@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:todo/constants/colors.dart';
 import 'package:todo/controller/todo_controller.dart';
 import 'package:todo/model/todo_model.dart';
+import 'package:todo/screen/home_screen.dart';
 
 class TodoDetails extends StatefulWidget {
   const TodoDetails({super.key, required this.todoModel, required this.index});
@@ -50,8 +51,15 @@ class _TodoDetailsState extends State<TodoDetails> {
       ),
       child: Column(children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [statusButton(), editButton()],
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(width: 15),
+            statusButton(),
+            SizedBox(width: 10),
+            editButton(),
+            SizedBox(width: 10),
+            deleteButton()
+          ],
         ),
         todoValue()
       ]),
@@ -59,67 +67,101 @@ class _TodoDetailsState extends State<TodoDetails> {
   }
 
   Widget statusButton() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 15, bottom: 5, top: 15),
-      child: TextButton(
-        style: TextButton.styleFrom(
-            backgroundColor: Colors.green.shade800,
-            foregroundColor: Colors.white),
-        child: Text("Change Status"),
-        onPressed: () => todoController.todoList[widget.index].status == 1
-            ? todoController.changeStatus(widget.todoModel.id, false)
-            : todoController.changeStatus(widget.todoModel.id, true),
-      ),
-    );
+    return Container(
+        padding: EdgeInsets.all(0),
+        height: 35,
+        width: 35,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade800,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: IconButton(
+          color: Colors.white,
+          icon: Icon(Icons.published_with_changes_outlined),
+          iconSize: 18,
+          onPressed: () => todoController.todoList[widget.index].status == 1
+              ? todoController.changeStatus(widget.todoModel.id, false)
+              : todoController.changeStatus(widget.todoModel.id, true),
+        ));
   }
 
   Widget editButton() {
-    return Padding(
-      padding: const EdgeInsets.only(right: 15, bottom: 5, top: 15),
-      child: TextButton(
-        style: TextButton.styleFrom(
-            backgroundColor: Colors.blueGrey.shade600,
-            foregroundColor: Colors.white),
-        child: Text("Edit"),
-        onPressed: () => todoEditDialog(),
-      ),
-    );
+    return Container(
+        padding: EdgeInsets.all(0),
+        margin: EdgeInsets.symmetric(vertical: 12),
+        height: 35,
+        width: 35,
+        decoration: BoxDecoration(
+          color: Colors.green,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: IconButton(
+          color: Colors.white,
+          icon: Icon(Icons.edit),
+          iconSize: 18,
+          onPressed: () => todoEditDialog(),
+        ));
+  }
+
+  Widget deleteButton() {
+    return Container(
+        padding: EdgeInsets.all(0),
+        margin: EdgeInsets.symmetric(vertical: 12),
+        height: 35,
+        width: 35,
+        decoration: BoxDecoration(
+          color: mRed,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: IconButton(
+          color: Colors.white,
+          icon: Icon(
+            Icons.delete,
+          ),
+          iconSize: 18,
+          onPressed: () {
+            todoController.deleteTodo(widget.todoModel.id);
+            Get.back();
+          },
+        ));
   }
 
   Widget todoValue() {
-    return Obx(() => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListTile(
-              title: Text(
-                todoController.todoList[widget.index].title.toString(),
-                style: GoogleFonts.alike(
-                    textStyle: Theme.of(context).textTheme.titleMedium),
+    return Obx(() => todoController.todoList.isNotEmpty
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListTile(
+                title: Text(
+                  todoController.todoList[widget.index].title.toString(),
+                  style: GoogleFonts.alike(
+                      textStyle: Theme.of(context).textTheme.titleMedium),
+                ),
+                subtitle: Text(
+                    todoController.todoList[widget.index].createAt.toString(),
+                    style: GoogleFonts.alike()),
               ),
-              subtitle: Text(
-                  todoController.todoList[widget.index].createAt.toString(),
-                  style: GoogleFonts.alike()),
-            ),
 
-            // Status
-            todoController.todoList[widget.index].status == 1
-                ? Padding(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: Text(
-                      "Completed",
-                      style:
-                          GoogleFonts.acme(fontSize: 18, color: Colors.green),
-                    ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: Text(
-                      "Incompled",
-                      style: GoogleFonts.acme(fontSize: 18, color: mGrey),
-                    ),
-                  )
-          ],
-        ));
+              // Status
+              todoController.todoList[widget.index].status == 1
+                  ? Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: Text(
+                        "Completed",
+                        style:
+                            GoogleFonts.acme(fontSize: 18, color: Colors.green),
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: Text(
+                        "Incompleted",
+                        style: GoogleFonts.acme(fontSize: 18, color: mGrey),
+                      ),
+                    )
+            ],
+          )
+        : Text("Loading..."));
   }
 
   Future todoEditDialog() => showDialog(
